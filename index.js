@@ -42,7 +42,7 @@ app.listen(PORT, (error) => {
 })
 
  // create card order
-app.post('/webhook', express.raw({ type: 'application/json' })), catchError(async (req, res) => {
+app.post('/webhook', express.raw({ type: 'application/json' }), catchError(async (req, res) => {
 
     const sig = req.headers['stripe-signature'].toString();
 
@@ -87,7 +87,7 @@ if (!cart) return next(new AppError('cart not found', (401)))
 
 
     res.json({ messege: "success", checkout });
-})
+}))
 
 
 
