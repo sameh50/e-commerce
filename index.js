@@ -26,7 +26,6 @@ import Stripe from 'stripe';
 import { messege } from './database/models/messegeModel.js';
 import { orders } from './database/models/orderModel.js';
 import { carts } from './database/models/cartModel.js';
-import { products } from './database/models/productModel.js';
 const stripe = new Stripe(process.env.STRIPE_KEY);
 process.on('uncaughtException', () => { // error in code
     console.log('code error');
@@ -43,6 +42,52 @@ app.listen(PORT, (error) => {
 })
 
 
+app.post('/webhook', express.raw({ type: 'application/json' })), catchError(async (req, res) => {
+
+    const sig = req.headers['stripe-signature'].toString();
+
+    let event = stripe.webhooks.constructEvent(req.body, sig, "whsec_r5tFhI6nn6kxOVcxNmSP5Ub2WGzxg5Jm");
+    let checkout
+    if (event.type == 'checkout.session.completed') {
+
+        checkout = event.data.object;
+    }
+
+    // create card order
+
+let user=await users.findOne({email:checkout.customer_email})
+let cart = await carts.findById(checkout.client_reference_id)
+if (!cart) return next(new AppError('cart not found', (401)))
+    let order = await orders.create({ user: user._id, orderItems: cart.cartItems, shippingAddresses: checkout.metadata, totalOrderPrice: checkout.amount_total/100,paymentType:'card',isPaid:true })
+
+    await order.save()
+    res.json({ messege: "order added", order })
+    // looping on products to increase sold and decrease stock
+    let options = cart.cartItems.map((prod) => {
+        return (
+            {
+                updateOne: {
+
+                    "filter": { _id: prod.product },
+                    "update": { $inc: { sold: prod.quantity, stock: -prod.quantity } }
+                }
+            }
+
+        )
+
+    })
+    await products.bulkWrite(options)
+    //clear cart after order
+    await carts.findByIdAndDelete(cart._id)
+    res.json({ messege: "success" })
+
+
+
+
+
+
+    res.json({ messege: "success", checkout });
+})
 
 
 
@@ -98,8 +143,7 @@ app.listen(PORT, (error) => {
 
 
 
-
-
+app.use(express.json())
 
 app.use("/auth", userRouter)
 app.use("/", user_adminRouter)
@@ -113,12 +157,12 @@ app.use("/", washlistRouter)
 app.use("/", addressRouter)
 app.use("/", couponRouter)
 app.use("/", cartsRouter)
-
-
 app.use("/", orderRouter)
 
 
-app.use(express.json())
+
+
+
 
 app.use(cors())
 
