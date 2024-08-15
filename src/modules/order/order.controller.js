@@ -103,9 +103,11 @@ export const CreateCheckOutSession = catchError(async (req, res, next) => {
 
 })
 
- // create card order
 
-export const CreateCardOrder= catchError(async (req, res) => {
+    // create card order
+
+
+export const CreateCardorder= catchError(async (req, res) => {
 
     const sig = req.headers['stripe-signature'].toString();
 
@@ -116,7 +118,7 @@ export const CreateCardOrder= catchError(async (req, res) => {
         checkout = event.data.object;
     }
 
-   
+    // create card order
 
     let user = await users.findOne({ email: checkout.customer_email })
     let cart = await carts.findById(checkout.client_reference_id)

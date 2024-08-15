@@ -13,7 +13,7 @@ import SubCategoryRouter from './src/modules/subCategory/subCategoryRoutes.js';
 import brandRouter from './src/modules/brands/brandsRoutes.js';
 import productsRouter from './src/modules/products/productsRoutes.js';
 import user_adminRouter from './src/modules/user-admin/user-admin.Routes.js';
-
+import { users } from './database/models/userModel.js';
 import 'dotenv/config'
 import reviewRouter from './src/modules/review/reviewRoutes.js';
 import washlistRouter from './src/modules/wishlist/wishlistRoutes.js';
@@ -97,7 +97,7 @@ app.listen(PORT, (error) => {
 
 
 
-app.use("/", orderRouter)
+
 
 app.use(express.json())
 
@@ -115,7 +115,7 @@ app.use("/", couponRouter)
 app.use("/", cartsRouter)
 
 
-
+app.use("/", orderRouter)
 
 
 

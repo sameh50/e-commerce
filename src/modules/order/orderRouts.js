@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { allowedTo, protectedRoutes } from "../user/user.controller.js";
-import { creatCashOrder, CreateCardOrder, CreateCheckOutSession, getAllrOrders, getUserOrders } from "./order.controller.js";
-import Stripe from 'stripe';
+import { creatCashOrder, CreateCardorder, CreateCheckOutSession, getAllrOrders, getUserOrders } from "./order.controller.js";
 import express from 'express'
 const orderRouter = Router()
 
@@ -14,5 +13,5 @@ orderRouter.get('/all-order', protectedRoutes, allowedTo('admin'), getAllrOrders
 //Check out session
 orderRouter.get('/Check-out/:id', protectedRoutes, allowedTo('user'), CreateCheckOutSession)
 
-orderRouter.post('/webhook', express.raw({ type: 'application/json' }),CreateCardOrder) 
+orderRouter.post('/webhook', express.raw({ type: 'application/json' }),CreateCardorder)
 export default orderRouter
