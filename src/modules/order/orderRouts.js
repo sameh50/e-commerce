@@ -13,5 +13,5 @@ orderRouter.get('/all-order', protectedRoutes, allowedTo('admin'), getAllrOrders
 //Check out session
 orderRouter.get('/Check-out/:id', protectedRoutes, allowedTo('user'), CreateCheckOutSession)
 
-orderRouter.post('/webhook', express.raw({ type: 'application/json' }),CreateCardorder)
+orderRouter.post('/webhook', express.raw({ type: 'application/json' }), CreateCardorder)
 export default orderRouter

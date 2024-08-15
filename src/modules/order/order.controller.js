@@ -4,6 +4,7 @@ import { cart, carts } from "../../../database/models/cartModel.js";
 import { coupons } from "../../../database/models/couponModel.js";
 import { orders } from "../../../database/models/orderModel.js";
 import { product, products } from "../../../database/models/productModel.js";
+import { users } from "../../../database/models/userModel.js";
 import { AppError } from "../../../utilities/appError.js";
 import { catchError } from "../../middleware/catchError.js";
 import Stripe from 'stripe';
@@ -118,7 +119,7 @@ export const CreateCardorder= catchError(async (req, res) => {
         checkout = event.data.object;
     }
 
-    // create card order
+    // create  order
 
     let user = await users.findOne({ email: checkout.customer_email })
     let cart = await carts.findById(checkout.client_reference_id)
