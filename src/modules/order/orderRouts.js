@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { allowedTo, protectedRoutes } from "../user/user.controller.js";
-import { creatCashOrder, CreateCardOrder, CreateCheckOutSession, getAllrOrders, getUserOrders } from "./order.controller.js";
-import express from 'express'
+import { creatCashOrder, CreateCheckOutSession, getAllrOrders, getUserOrders } from "./order.controller.js";
+;
 
 const orderRouter = Router()
 
@@ -13,6 +13,6 @@ orderRouter.get('/user-order', protectedRoutes, allowedTo('user'), getUserOrders
 orderRouter.get('/all-order', protectedRoutes, allowedTo('admin'), getAllrOrders)
 //Check out session
 orderRouter.get('/Check-out/:id', protectedRoutes, allowedTo('user'), CreateCheckOutSession)
-// create card order
-orderRouter.post('/webhook', express.raw({ type: 'application/json' }),CreateCardOrder)
+
+
 export default orderRouter
