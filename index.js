@@ -22,7 +22,9 @@ import couponRouter from './src/modules/coupon/couponRoutes.js';
 import cartsRouter from './src/modules/carts/cartsRouts.js';
 import orderRouter from './src/modules/order/orderRouts.js';
 import cors from 'cors'
-
+import Stripe from 'stripe';
+import { messege } from './database/models/messegeModel.js';
+const stripe = new Stripe(process.env.STRIPE_KEY);
 process.on('uncaughtException', () => { // error in code
     console.log('code error');
 
@@ -36,6 +38,56 @@ app.listen(PORT, (error) => {
     else
         console.log("Error occurred, server can't start", error);
 })
+
+
+app.post('/webhook', express.raw({type: 'application/json'}),catchError((req,res)=>{
+
+    const sig = req.headers['stripe-signature'].toString();
+
+    let  event = stripe.webhooks.constructEvent(req.body, sig, "whsec_r5tFhI6nn6kxOVcxNmSP5Ub2WGzxg5Jm");
+   let checkout
+ if(event.type=='checkout.session.completed'){
+
+  checkout  = event.data.object;}
+      res.json({ messege:"success",checkout});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 app.use(express.json())
