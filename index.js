@@ -13,7 +13,7 @@ import SubCategoryRouter from './src/modules/subCategory/subCategoryRoutes.js';
 import brandRouter from './src/modules/brands/brandsRoutes.js';
 import productsRouter from './src/modules/products/productsRoutes.js';
 import user_adminRouter from './src/modules/user-admin/user-admin.Routes.js';
-import { user, users } from './database/models/userModel.js';
+
 import 'dotenv/config'
 import reviewRouter from './src/modules/review/reviewRoutes.js';
 import washlistRouter from './src/modules/wishlist/wishlistRoutes.js';
@@ -24,13 +24,16 @@ import orderRouter from './src/modules/order/orderRouts.js';
 import cors from 'cors'
 import Stripe from 'stripe';
 import { messege } from './database/models/messegeModel.js';
+import { orders } from './database/models/orderModel.js';
+import { carts } from './database/models/cartModel.js';
+import { products } from './database/models/productModel.js';
 const stripe = new Stripe(process.env.STRIPE_KEY);
 process.on('uncaughtException', () => { // error in code
     console.log('code error');
 
 })
 const app = express();
-const PORT = process.env.PORT||3000;
+const PORT = process.env.PORT || 3000;
 app.use('/uploads', express.static('uploads')) // make server access folders directory
 app.listen(PORT, (error) => {
     if (!error)
@@ -40,31 +43,6 @@ app.listen(PORT, (error) => {
 })
 
 
-app.post('/webhook', express.raw({type: 'application/json'}),catchError((req,res)=>{
-
-    const sig = req.headers['stripe-signature'].toString();
-
-    let  event = stripe.webhooks.constructEvent(req.body, sig, "whsec_r5tFhI6nn6kxOVcxNmSP5Ub2WGzxg5Jm");
-   let checkout
- if(event.type=='checkout.session.completed'){
-
-  checkout  = event.data.object;}
-      res.json({ messege:"success",checkout});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}))
 
 
 
@@ -89,6 +67,37 @@ app.post('/webhook', express.raw({type: 'application/json'}),catchError((req,res
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+app.use("/", orderRouter)
 
 app.use(express.json())
 
@@ -104,7 +113,7 @@ app.use("/", washlistRouter)
 app.use("/", addressRouter)
 app.use("/", couponRouter)
 app.use("/", cartsRouter)
-app.use("/", orderRouter)
+
 
 
 

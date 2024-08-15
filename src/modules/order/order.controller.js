@@ -102,3 +102,50 @@ export const CreateCheckOutSession = catchError(async (req, res, next) => {
 
 
 })
+
+ // create card order
+
+export const CreateCardOrder= catchError(async (req, res) => {
+
+    const sig = req.headers['stripe-signature'].toString();
+
+    let event = stripe.webhooks.constructEvent(req.body, sig, "whsec_r5tFhI6nn6kxOVcxNmSP5Ub2WGzxg5Jm");
+    let checkout
+    if (event.type == 'checkout.session.completed') {
+
+        checkout = event.data.object;
+    }
+
+   
+
+    let user = await users.findOne({ email: checkout.customer_email })
+    let cart = await carts.findById(checkout.client_reference_id)
+    if (!cart) return next(new AppError('cart not found', (401)))
+    let order = await orders.create({ user: user._id, orderItems: cart.cartItems, shippingAddresses: checkout.metadata, totalOrderPrice: checkout.amount_total / 100, paymentType: 'card', isPaid: true })
+
+    await order.save()
+    res.json({ messege: "order added", order })
+    // looping on products to increase sold and decrease stock
+    let options = cart.cartItems.map((prod) => {
+        return (
+            {
+                updateOne: {
+
+                    "filter": { _id: prod.product },
+                    "update": { $inc: { sold: prod.quantity, stock: -prod.quantity } }
+                }
+            }
+
+        )
+
+    })
+    await products.bulkWrite(options)
+    //clear cart after order
+    await carts.findByIdAndDelete(cart._id)
+
+
+
+
+
+    res.json({ messege: "success", checkout });
+})
